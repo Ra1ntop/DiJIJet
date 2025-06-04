@@ -34,6 +34,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getUserId(String email) {
+        if (email == null || email.isBlank()) {
+            throw new Ra1nException("Email must not be empty", HttpStatus.BAD_REQUEST);
+        }
         return userRepository.findByEmail(email)
                 .map(User::getId)
                 .orElseThrow(() -> new Ra1nException("User with sub " + email + " not found", HttpStatus.NOT_FOUND));
@@ -41,6 +44,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
+        if (request == null || request.email() == null || request.email().isBlank()
+                || request.password() == null || request.password().isBlank()) {
+            throw new Ra1nException("Invalid registration data", HttpStatus.BAD_REQUEST);
+        }
         if (userRepository.existsByEmail(request.email())) {
             throw new Ra1nException("Email already in use: " + request.email(), HttpStatus.CONFLICT);
         }
@@ -55,8 +62,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        if (request == null || request.email() == null || request.email().isBlank()
+                || request.password() == null || request.password().isBlank()) {
+            throw new Ra1nException("Invalid login data", HttpStatus.BAD_REQUEST);
+        }
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        } catch (org.springframework.security.core.AuthenticationException ex) {
+            throw new Ra1nException("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        }
         AbstractUser user = (AbstractUser) authentication.getPrincipal();
         String token = jwtUtils.generateToken(user);
         return new AuthResponse(token);

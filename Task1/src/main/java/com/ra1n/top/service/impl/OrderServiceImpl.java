@@ -26,6 +26,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto createOrder(OrderDto orderDTO) {
+        if (orderDTO == null
+                || orderDTO.getCustomerName() == null || orderDTO.getCustomerName().isBlank()
+                || orderDTO.getOrderItems() == null || orderDTO.getOrderItems().isEmpty()) {
+            throw new com.ra1n.top.model.exception.Ra1nException(
+                    "Invalid order data", org.springframework.http.HttpStatus.BAD_REQUEST
+            );
+        }
         Order order = orderMapper.orderDTOToOrder(orderDTO);
 
         Order savedOrder = orderRepository.save(order);
@@ -35,6 +42,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrdersByCustomer(String customerName) {
+        if (customerName == null || customerName.isBlank()) {
+            throw new com.ra1n.top.model.exception.Ra1nException(
+                    "Customer name must not be empty", org.springframework.http.HttpStatus.BAD_REQUEST
+            );
+        }
         List<Order> orders = orderRepository.findByCustomerName(customerName);
 
         return orders.stream()

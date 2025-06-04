@@ -2,6 +2,7 @@ package com.ra1n.top.controller;
 
 import com.ra1n.top.model.dto.OrderDto;
 import com.ra1n.top.model.entity.Order;
+import com.ra1n.top.model.exception.Ra1nException;
 import com.ra1n.top.output.persistent.OrderRepository;
 import com.ra1n.top.service.OrderService;
 import com.ra1n.top.service.mappers.OrderMapper;
@@ -28,11 +29,23 @@ public class OrderController {
 
     @PostMapping
     public OrderDto createOrder(@RequestBody OrderDto orderDTO) {
+        if (orderDTO == null
+                || orderDTO.getCustomerName() == null || orderDTO.getCustomerName().isBlank()
+                || orderDTO.getOrderItems() == null || orderDTO.getOrderItems().isEmpty()) {
+            throw new Ra1nException(
+                    "Invalid order data", org.springframework.http.HttpStatus.BAD_REQUEST
+            );
+        }
         return orderService.createOrder(orderDTO);
     }
 
     @GetMapping("/by-customer")
     public List<OrderDto> getOrdersByCustomer(@RequestParam String customerName) {
+        if (customerName == null || customerName.isBlank()) {
+            throw new Ra1nException(
+                    "Customer name must not be empty", org.springframework.http.HttpStatus.BAD_REQUEST
+            );
+        }
         return orderService.getOrdersByCustomer(customerName);
     }
 }

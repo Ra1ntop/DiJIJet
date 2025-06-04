@@ -2,6 +2,7 @@ package com.ra1n.top.controller;
 
 import com.ra1n.top.model.dto.MenuItemDto;
 import com.ra1n.top.model.entity.MenuItem;
+import com.ra1n.top.model.exception.Ra1nException;
 import com.ra1n.top.output.persistent.MenuItemRepository;
 import com.ra1n.top.service.MenuItemService;
 import com.ra1n.top.service.mappers.MenuItemMapper;
@@ -32,11 +33,24 @@ public class MenuItemController {
 
     @GetMapping("/{cafeId}")
     public ResponseEntity<List<MenuItemDto>> getMenuByCafeId(@PathVariable String cafeId) {
-       return ResponseEntity.ok(menuItemService.getMenuByCafeId(cafeId));
+        if (cafeId == null || cafeId.isBlank()) {
+            throw new Ra1nException(
+                    "Cafe id must not be empty", HttpStatus.BAD_REQUEST
+            );
+        }
+        return ResponseEntity.ok(menuItemService.getMenuByCafeId(cafeId));
     }
 
     @PostMapping
     public ResponseEntity<MenuItemDto> addMenuItem(@RequestBody MenuItemDto menuItemDTO) {
+        if (menuItemDTO == null
+                || menuItemDTO.getName() == null || menuItemDTO.getName().isBlank()
+                || menuItemDTO.getPrice() == null || menuItemDTO.getPrice().signum() < 0
+                || menuItemDTO.getCategory() == null) {
+            throw new Ra1nException(
+                    "Invalid menu item data", HttpStatus.BAD_REQUEST
+            );
+        }
         return ResponseEntity.ok(menuItemService.addMenuItem(menuItemDTO));
     }
 }

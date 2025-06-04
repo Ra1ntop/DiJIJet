@@ -23,6 +23,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private static final String[] AUTH_WHITE_LIST = {
+            "/v1/auth/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v2/api-docs/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/configuration/**",
+            "/webjars/**",
+            };
+
     private final JwtAuthenticationFilter jwtFilter;
 
     @Bean
@@ -30,16 +41,11 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api-v1/**").permitAll()
-                        .requestMatchers("/api-v2/**").permitAll()
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api-v1/auth/**").permitAll()
+                        .requestMatchers("/api-v2/auth/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers(AUTH_WHITE_LIST).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

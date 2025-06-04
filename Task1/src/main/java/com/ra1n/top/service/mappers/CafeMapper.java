@@ -3,6 +3,7 @@ package com.ra1n.top.service.mappers;
 import com.ra1n.top.model.dto.CafeDto;
 import com.ra1n.top.model.entity.Cafe;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface CafeMapper {
 
     List<CafeDto> cafesToCafeDTOs(List<Cafe> cafes);
 
-
+    @Mapping(target = "id", ignore = true)
     Cafe cafeDTOToCafe(CafeDto cafeDTO);
 }
 
