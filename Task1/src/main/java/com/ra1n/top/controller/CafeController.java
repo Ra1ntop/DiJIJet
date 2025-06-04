@@ -31,7 +31,6 @@ public class CafeController {
     @GetMapping("/cafes")
     public List<CafeDto> getAllCafes(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-
         return cafeService.getAllCafe(pageable);
     }
 
