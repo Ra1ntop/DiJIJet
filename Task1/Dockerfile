@@ -1,12 +1,10 @@
-# Use official JDK for build stage
-FROM openjdk:17-jdk-slim AS builder
-# Set working directory for build stage
+# Use official Gradle image for build stage
+FROM gradle:8.13-jdk17 AS builder
 WORKDIR /workspace
 
-# Copy all files and build application
+# Copy all files and build application using Gradle
 COPY . .
-RUN chmod +x gradlew && \
-    ./gradlew clean bootJar --no-daemon -x test
+RUN gradle clean bootJar --no-daemon -x test
 
 # Use minimal JRE for runtime
 FROM openjdk:17-slim
