@@ -1,0 +1,13 @@
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+**/build/
+*.class
+*.jar
+*.war
+*.iml
+.idea
+out/
+.DS_Store
+Dockerfile
+docker-compose.yml

@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Password!}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-Task1_DIJI}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Password!}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-Task1_DIJI}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-root}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-Password!}
+      JWT_SECRET: ${JWT_SECRET:-your_very_secure_32_byte_minimum_secret}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7}
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
+    driver: local
